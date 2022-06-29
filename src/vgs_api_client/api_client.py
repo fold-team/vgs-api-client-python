@@ -318,6 +318,15 @@ class ApiClient(object):
         # fetch data from response object
         try:
             received_data = json.loads(response.data)
+
+            # temporary hack fix to manually set storage if null is returned
+            # If data dictionary is returned then we loop through each record and check if
+            # storage key is set to None and if so we manually set to PERSISTENT
+            data = received_data.get("data")
+            if data:
+                for record in data:
+                    if "storage" in record and record["storage"] is None:
+                        record["storage"] = "PERSISTENT"
         except ValueError:
             received_data = response.data
 
